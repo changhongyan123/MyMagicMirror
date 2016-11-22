@@ -85,7 +85,7 @@ class PhotoProcessing:
             elif currEmotion == 'happiness':
                 logo = cv2.imread('/home/chang/图片/happiness.jpg')
             elif currEmotion == 'neutral':
-                logo = cv2.imread('/home/chang/图片/neutral.jpg')
+                logo = cv2.imread('/home/chang/图片/neutral.png')
             elif currEmotion == 'sadness':
                 logo = cv2.imread('/home/chang/图片/sadness.jpg')
             elif currEmotion == 'surprise':
@@ -96,7 +96,7 @@ class PhotoProcessing:
             height=faceRectangle['height']#169
 
 
-            logo=cv2.resize(logo,((width),(height)),interpolation=cv2.INTER_CUBIC)#rows=189 cols=191
+            logo=cv2.resize(logo,((width-20),(height-20)),interpolation=cv2.INTER_CUBIC)#rows=189 cols=191
 
             logo_gray = cv2.cvtColor(logo, cv2.COLOR_BGR2GRAY)
             rows, cols, channels = logo.shape#
