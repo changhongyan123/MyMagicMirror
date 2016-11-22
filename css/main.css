@@ -107,6 +107,22 @@ sup {
   font-size: 50%;
   line-height: 50%;
 }
+canvas { 
+  
+  position:relative; 
+  top:100px; 
+  left:60px; 
+  width: 400px;
+  height: 300px;
+}
+video { 
+  
+  position:relative; 
+  top:100px; 
+  left:60px; 
+  width: 400px;
+  height: 300px;
+}
 
 /**
  * Module styles.

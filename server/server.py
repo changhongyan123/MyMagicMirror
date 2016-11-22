@@ -6,6 +6,9 @@ import numpy as np
 import random
 import pandas as pd
 from os   import system
+from photo import PhotoProcessing
+import time
+
 
 #服务器端配置
 HOST_NAME = 'localhost'
@@ -25,8 +28,10 @@ PORT_NUMBER = 9000
 
 import numpy as np
 
-data_matrix = pd.read_csv('emo_fea_unscaled.csv',delimiter=',').values
-data_labels = pd.read_csv('emo_tag.csv').values
+#data_matrix = pd.read_csv('emo_fea_unscaled.csv',delimiter=',').values
+#data_labels = pd.read_csv('emo_tag.csv').values
+data_labels =  np.loadtxt('emo_tag.csv',dtype=str)
+data_matrix = np.loadtxt('emo_fea_unscaled.csv',delimiter=',')
 
 
 
@@ -35,7 +40,8 @@ train_indice = range(252)
 # 打乱训练顺序
 random.shuffle(train_indice)
 
-nn = MyModel(data_matrix, data_labels);
+nn = MyModel(data_matrix, data_labels)
+photo_model = PhotoProcessing()
 
 def WavToCsv(filename):
     system('cd /home/chang/opensmile-2.3.0 && ./SMILExtract -C config/IS09\_emotion.conf -I /home/chang/temp/'+filename+'.wav -O /home/chang/data/'+filename+'.csv')
@@ -61,13 +67,21 @@ class JSONHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         var_len = int(self.headers.get('Content-Length'))
         content = self.rfile.read(var_len)
         payload = json.loads(content)
-        filename = payload['wav']
-        print filename
+        time.sleep(5)
         # 如果是训练请求，训练然后保存训练完的神经网络
         # 如果是预测请求，返回预测值
         if payload.get('predict'):
-            print nn.predict(data_matrix[0])
+            filename = payload['wav']
+            #print filename
+            print 'deal_wav'
             response = {"type":"test", "result":str(nn.predict(WavToCsv(filename)))}
+            print (nn.predict(WavToCsv(filename)))
+            #print nn.predict(WavToCsv(filename)
+        elif payload.get('photo_predict'):
+            photoname = payload['photo']
+            print photoname
+            print photo_model.showphoto(photoname); 
+            response = {"type":"emotion", "result":str( photo_model.showphoto(photoname))}
         else:
             response_code = 400
 
