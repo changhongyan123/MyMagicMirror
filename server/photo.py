@@ -74,7 +74,7 @@ class PhotoProcessing:
         for currFace in result:
             faceRectangle = currFace['faceRectangle']
             currEmotion = max(currFace['scores'].items(), key=operator.itemgetter(1))[0]
-            if currEmotion == 'anger':
+            '''if currEmotion == 'anger':
                 logo = cv2.imread('/home/chang/图片/anger.jpg')
             elif currEmotion == 'contempt':
                 logo = cv2.imread('/home/chang/图片/contempt.jpg')
@@ -85,7 +85,7 @@ class PhotoProcessing:
             elif currEmotion == 'happiness':
                 logo = cv2.imread('/home/chang/图片/happiness.jpg')
             elif currEmotion == 'neutral':
-                logo = cv2.imread('/home/chang/图片/neutral.png')
+                logo = cv2.imread('/home/chang/图片/neutral.jpg')
             elif currEmotion == 'sadness':
                 logo = cv2.imread('/home/chang/图片/sadness.jpg')
             elif currEmotion == 'surprise':
@@ -96,7 +96,7 @@ class PhotoProcessing:
             height=faceRectangle['height']#169
 
 
-            logo=cv2.resize(logo,((width-20),(height-20)),interpolation=cv2.INTER_CUBIC)#rows=189 cols=191
+            logo=cv2.resize(logo,((width-10),(height-10)),interpolation=cv2.INTER_CUBIC)#rows=189 cols=191
 
             logo_gray = cv2.cvtColor(logo, cv2.COLOR_BGR2GRAY)
             rows, cols, channels = logo.shape#
@@ -104,7 +104,7 @@ class PhotoProcessing:
             roi = img[(top):(top+rows),(left):(cols+left)]#row:188 col:190
           
             # binary & mask
-            ret, mask = cv2.threshold(logo_gray, 253, 255, cv2.THRESH_BINARY)
+            ret, mask = cv2.threshold(logo_gray, 220, 255, cv2.THRESH_BINARY)
             # dst
             dst = roi
             re_row,re_col,re_channel =  dst.shape
@@ -114,9 +114,10 @@ class PhotoProcessing:
                 for c in xrange(re_col):#0-190
                     if mask[r, c] == 0:
                         dst[r, c, :] = logo[r, c, :]
-            img[(top):(top+rows),(left):(cols+left)] = dst
-            textToWrite = "%s" % ( currEmotion )
+            #img[(top):(top+rows),(left):(cols+left)] = dst
+            #textToWrite = "%s" % ( currEmotion )
             #cv2.putText( img, textToWrite, (faceRectangle['left'],faceRectangle['top']-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 1 )
+            '''
             return currEmotion
     def showphoto(self,filename):
         # Load raw image file into memory
@@ -139,8 +140,6 @@ class PhotoProcessing:
             
             currEmotion=self.renderResultOnImage( result, img )
             
-            cv2.imwrite(changedfilepath, img)
-            print result
             #print result
             return currEmotion
         else:

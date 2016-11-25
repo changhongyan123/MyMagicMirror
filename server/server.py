@@ -32,7 +32,11 @@ import numpy as np
 #data_labels = pd.read_csv('emo_tag.csv').values
 data_labels =  np.loadtxt('emo_tag.csv',dtype=str)
 data_matrix = np.loadtxt('emo_fea_unscaled.csv',delimiter=',')
-
+#feature = pd.read_csv("feature.csv")
+#data = feature.values
+#random.shuffle(data)
+#data_matrix = data[:,1:]
+#data_labels = data[:,0]
 
 
 # 数据集一共5000个数据，train_indice存储用来训练的数据的序号
@@ -44,7 +48,7 @@ nn = MyModel(data_matrix, data_labels)
 photo_model = PhotoProcessing()
 
 def WavToCsv(filename):
-    system('cd /home/chang/opensmile-2.3.0 && ./SMILExtract -C config/IS09\_emotion.conf -I /home/chang/temp/'+filename+'.wav -O /home/chang/data/'+filename+'.csv')
+    system('cd /home/chang/opensmile-2.3.0 && ./SMILExtract -C config/IS09\_emotion.conf -I /home/chang/temp/'+filename+'.wav  -O /home/chang/data/'+filename+'.csv')
     filepath='/home/chang/data/'+filename+'.csv'
     data = pd.read_csv(filepath,skiprows=[i for i in xrange(390)])
     data = data.replace("?","0")
@@ -56,6 +60,29 @@ def WavToCsv(filename):
         except:
             test_data[i] = 0
     return test_data
+
+def make_face(filepath,emotion):
+    if emotion == 'anger':
+        anotherpath = '/home/chang/MagicMirror/photo/anger.jpg'
+    elif emotion == 'contempt':
+        anotherpath = '/home/chang/MagicMirror/photo/contempt.jpg'
+    elif emotion == 'disgust':
+        anotherpath = '/home/chang/MagicMirror/photo/disgust.jpg'
+    elif emotion == 'fear':
+        anotherpath = '/home/chang/MagicMirror/photo/fear.jpg'
+    elif emotion == 'happiness':
+        anotherpath = '/home/chang/MagicMirror/photo/happiness.jpg'
+    elif emotion == 'neutral':
+        anotherpath = '/home/chang/MagicMirror/photo/neutral.jpg'
+    elif emotion == 'sadness':
+        anotherpath = '/home/chang/MagicMirror/photo/sadness.jpg'
+    elif emotion == 'surprise':
+        anotherpath = '/home/chang/MagicMirror/photo/surprise.jpg'
+    else:
+        anotherpath = 'home/chang/MagicMirror/photo/test.jpg'
+    system('python faceswap.py '+filepath+' '+anotherpath+'')
+    
+
 
 
 class JSONHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -80,7 +107,11 @@ class JSONHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         elif payload.get('photo_predict'):
             photoname = payload['photo']
             print photoname
-            print photo_model.showphoto(photoname); 
+            print photo_model.showphoto(photoname)
+            emotion = str( photo_model.showphoto(photoname))
+            pathToFileInDisk = '/home/chang/temp/'
+            path = pathToFileInDisk + photoname
+            make_face(path,emotion)
             response = {"type":"emotion", "result":str( photo_model.showphoto(photoname))}
         else:
             response_code = 400

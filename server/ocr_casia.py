@@ -27,13 +27,14 @@ class MyModel:
         # 数据集
         self.data_matrix = data_matrix
         self.data_labels = data_labels
-       
+        self.scaler = preprocessing.StandardScaler().fit(data_matrix)   # new added  3  对应于casia特征集的缩放器
+        self.data_matrix = self.scaler.transform(data_matrix)           # new added 4 
 
         if (not os.path.isfile(self.NN_FILE_PATH) or not use_file):
             # 初始化神经网络
             # 训练并保存
-            self.clf	 = svm.SVC(kernel='rbf',C=10,gamma=0.01,cache_size=4000,max_iter=10000,shrinking=True)   # new added 5 将原来的linearSVC 改为 SVC
-            #self.clf = OneVsOneClassifier(LinearSVC(random_state=0))
+            #self.clf = svm.SVC(kernel='rbf',C=10,gamma=0.01,cache_size=4000,max_iter=10000,shrinking=True)   # new added 5 将原来的linearSVC 改为 SVC
+            self.clf = OneVsOneClassifier(LinearSVC(random_state=0))
             ids = np.arange(len(data_labels))
             np.random.shuffle(ids)
             # shuffle
@@ -52,13 +53,13 @@ class MyModel:
         #data_matrix = self.scaler.transform(data_matrix)   # new added 6  缩放特征
         self.clf.fit(data_matrix,data_labels)
         print "training..."
-       # y_pred = self.predict(data_matrix)
-       #	 print(classification_report(data_labels, y_pred))
+        y_pred = self.clf.predict(data_matrix)
+        print(classification_report(data_labels, y_pred))
 
     def predict(self, test):
-        #test = self.scaler.transform(test)    # new added  7 缩放特征
-      
+        test = self.scaler.transform(test)    # new added  7 缩放特征
         a  =  self.clf.predict(test)
+        #print a 
         a = ''.join(a)
         return a
     def save(self):
